@@ -19,7 +19,7 @@ public class Venda implements IDescontavel{
 
     @Override
     public double calcularDesconto() {
-
+        return 0;
     }
 
 
