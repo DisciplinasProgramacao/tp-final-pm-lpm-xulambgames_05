@@ -15,9 +15,5 @@ public enum TipoJogo {
         return this.tipo;
     }
 
-    @Override
-    public String toString(){
-        return this.name().toLowerCase();
-    }
 
 }
