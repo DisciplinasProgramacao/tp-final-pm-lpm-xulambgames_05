@@ -1,9 +1,11 @@
 public class Sistema {
 
-    public void salvarDadosCliente(){}
-    public void salvarDadosPedidos(){}
-    public void carregarDadosCliente(){}
-    public void carregarDadosPedidos(){}
+    public void salvarDadosClienteBin(){}
+    public void salvarDadosPedidosBin(){}
+    public void carregarDadosClienteBin(){}
+    public void carregarDadosPedidosBin(){}
+
+
 
     public static void main(String[] args) throws Exception {
         System.out.println("Hello, World!");
