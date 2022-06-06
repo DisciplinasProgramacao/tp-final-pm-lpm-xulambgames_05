@@ -6,8 +6,9 @@ public class Cliente {
     private String userName;
     private String senha;
     private String email;
-    private ArrayList<Venda> arrayList;
+    private ArrayList<Venda> vendasList;
     private IPagavel nivel;
+
 
     public Cliente(String codigo, String nome, String userName, String senha, 
             String email, ArrayList<Venda> arrayList, IPagavel nivel){
@@ -16,12 +17,16 @@ public class Cliente {
         this.userName = userName;
         this.senha = senha;
         this.email = email;
-        this.arrayList = arrayList;
+        this.vendasList = arrayList;
         this.nivel = nivel;
     }  
 
-    public Venda historicoCompras(){
-        return new Venda();
+    public ArrayList<Venda> historicoCompras(){
+        return this.vendasList;
+    }
+
+    public void addVenda(Venda venda){
+        this.vendasList.add(venda);
     }
 
 }
