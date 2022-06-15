@@ -1,11 +1,13 @@
-public abstract class Jogo{
+public class Jogo{
+
 
     private String codigo;
     private String titulo;
     private double precoBase;
+    private TipoJogo tipoJogo = null;
 
 
-    public Jogo(String codigo, String titulo, double precoBase){
+    public Jogo(String codigo, String titulo, double precoBase, TipoJogo tipoJogo){
         this.codigo = codigo;
         this.titulo = titulo;
         
@@ -14,6 +16,7 @@ public abstract class Jogo{
         }
         
         this.precoBase = precoBase;
+        this.tipoJogo = tipoJogo;
     }
 
     public double getPrecoBase() {
@@ -34,9 +37,19 @@ public abstract class Jogo{
     public void setCodigo(String codigo) {
         this.codigo = codigo;
     }
-    
+
     public double calcularValor(){
         return this.precoBase;
     }
 
+    public TipoJogo getTipoJogo() {
+        return this.tipoJogo;
+    }
+
+    public boolean equals(Jogo outro){
+        if (outro.getCodigo().equals(this.getCodigo())) {
+            return true;
+        }
+        return false;
+    }
 }

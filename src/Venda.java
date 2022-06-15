@@ -1,17 +1,26 @@
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.HashMap;
 
-public class Venda implements IDescontavel{
+public class Venda{
     private ArrayList<Jogo> jogosList;
-    private Data dataVenda;
-    private double descontoAplicado;
+    private Calendar dataVenda;
 
     
 
-    public Venda(ArrayList<Jogo> jogosList, Data dataVenda, double descontoAplicado) {
+    public Calendar getDataVenda() {
+        return dataVenda;
+    }
+
+
+    public void setDataVenda(Calendar dataVenda) {
+        this.dataVenda = dataVenda;
+    }
+
+
+    public Venda(ArrayList<Jogo> jogosList, Calendar dataVenda) {
         this.jogosList = jogosList;
         this.dataVenda = dataVenda;
-        this.descontoAplicado = descontoAplicado;
     }
 
 
@@ -20,12 +29,11 @@ public class Venda implements IDescontavel{
         for (Jogo jogo : jogosList) {
             valor += jogo.calcularValor();
         }
-        valor -= calcularDesconto();
+        valor -= (valor * calcularDesconto());
         return valor;
     }
 
 
-    @Override
     public double calcularDesconto() {
         double desconto = 0;
         HashMap<Integer,Integer> mapaJogos = new HashMap<Integer, Integer>();
@@ -65,7 +73,6 @@ public class Venda implements IDescontavel{
             REGULAR(2),
             PROMOCAO(3);
          
-            Contém três regulares e um acima 
         */
         
 
@@ -73,7 +80,7 @@ public class Venda implements IDescontavel{
             mapaJogos.get(1)>=3 || 
             mapaJogos.get(2)>=5 ||
             (mapaJogos.get(1)>=2 && jogosList.size() >=3) ||
-            (mapaJogos.get(2)>=3 && jogosList.size() >=4)
+            (mapaJogos.get(2)>=3 && (mapaJogos.get(0) >=1 || mapaJogos.get(1) >=1))
             ) {
             desconto = 0.2;
         }
