@@ -1,13 +1,18 @@
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 
 import java.util.HashMap;
 
 public class Venda{
     private ArrayList<Jogo> jogosList;
-    private LocalDate dataVenda;
-
     
+    private LocalDate dataVenda;
+    
+    
+    public ArrayList<Jogo> getJogosList() {
+        return jogosList;
+    }
 
     public LocalDate getDataVenda() {
         return dataVenda;
@@ -37,41 +42,30 @@ public class Venda{
 
     public double calcularDesconto() {
         double desconto = 0;
-        HashMap<Integer,Integer> mapaJogos = new HashMap<Integer, Integer>();
+        HashMap<TipoJogo,Integer> mapaJogos = new HashMap<TipoJogo, Integer>();
 
-            
         /*  LANCAMENTO(0),
             PREMIUM(1),
             REGULAR(2),
             PROMOCAO(3); */
 
-        for (Jogo jogo : jogosList) {
-            if (jogo.getTipoJogo().getTipo() == 0) {
-                mapaJogos.put(0,  mapaJogos.getOrDefault(0,0) + 1);
-            }else{
-                if (jogo.getTipoJogo().getTipo() == 1) {
-                    mapaJogos.put(1, mapaJogos.getOrDefault(1,0)  + 1);
-                }else{
-                    if (jogo.getTipoJogo().getTipo() == 2) {
-                        mapaJogos.put(2, mapaJogos.getOrDefault(2,0)  + 1);
-                    }else{
-                        if (jogo.getTipoJogo().getTipo() == 3) {
-                            mapaJogos.put(3, mapaJogos.getOrDefault(3,0)  + 1);
-                        }
-                    }
-                }
-            }
-        }
-        
-        if (mapaJogos.getOrDefault(1,0) >= 2 || mapaJogos.getOrDefault(2,0) >= 4) {
+            // Teste
+        mapaJogos.put(TipoJogo.LANCAMENTO,  (int) jogosList.stream().filter(j -> j.getTipoJogo() == TipoJogo.LANCAMENTO).count());
+        mapaJogos.put(TipoJogo.PREMIUM,     (int) jogosList.stream().filter(j -> j.getTipoJogo() == TipoJogo.PREMIUM).count());
+        mapaJogos.put(TipoJogo.REGULAR,     (int) jogosList.stream().filter(j -> j.getTipoJogo() == TipoJogo.REGULAR).count());
+        mapaJogos.put(TipoJogo.PROMOCAO,    (int) jogosList.stream().filter(j -> j.getTipoJogo() == TipoJogo.PROMOCAO).count());
+
+
+        // PROMOCOES
+        if (mapaJogos.get(TipoJogo.PREMIUM) >= 2 || mapaJogos.get(TipoJogo.REGULAR) >= 4) {
             desconto = 0.1;
         }
 
-        if (mapaJogos.getOrDefault(0,0)>=2 || 
-            mapaJogos.getOrDefault(1,0)>=3 || 
-            mapaJogos.getOrDefault(2,0)>=5 ||
-            (mapaJogos.getOrDefault(1,0)>=2 && jogosList.size() >=3) ||
-            (mapaJogos.getOrDefault(2,0)>=3 && (mapaJogos.getOrDefault(0,0) >=1 || mapaJogos.getOrDefault(1,0) >=1))
+        if (mapaJogos.get(TipoJogo.LANCAMENTO)>=2 || 
+            mapaJogos.get(TipoJogo.PREMIUM)>=3 || 
+            mapaJogos.get(TipoJogo.REGULAR)>=5 ||
+            (mapaJogos.get(TipoJogo.PREMIUM)>=2 && jogosList.size() >=3) ||
+            (mapaJogos.get(TipoJogo.REGULAR)>=3 && (mapaJogos.get((TipoJogo.LANCAMENTO)) >=1 || mapaJogos.get((TipoJogo.PREMIUM)) >=1))
             ) {
             desconto = 0.2;
         }
@@ -83,11 +77,15 @@ public class Venda{
     @Override
     public String toString(){
 
-        String s = this.dataVenda.toString() + ": {\n";
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+        String dataFormatada = this.dataVenda.format(formatter);
+
+        String s = dataFormatada.toString() + ": {\n\n";
+        
         for (Jogo j : this.jogosList) {
             s+= "\t" + j.toString() + "\n";
         }
-        s = s + "\tvalor total: R$" + this.calcularValor();
+        s = s + "\n\tvalor total: R$" + this.calcularValor();
         s +="\n}";
         return s;
     }
