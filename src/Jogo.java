@@ -1,6 +1,7 @@
+import java.io.Serializable;
 import java.security.InvalidParameterException;
 
-public class Jogo{
+public class Jogo implements Serializable{
 
 
     private String codigo;
@@ -52,7 +53,6 @@ public class Jogo{
     public double calcularValor(){
         return this.precoBase - calcularDesconto();
     }
-
     public double calcularDesconto(){
         return precoBase * this.percDesconto;
     }
@@ -70,6 +70,6 @@ public class Jogo{
 
     @Override
     public String toString(){
-        return this.codigo + " - " + this.titulo + " R$" + this.calcularValor() +" "+ this.getTipoJogo().name().toUpperCase();
+        return this.codigo + " - \"" + this.titulo + "\" R$" + this.calcularValor() +" "+ this.getTipoJogo().name().toUpperCase();
     }
 }

@@ -1,55 +1,64 @@
-import java.time.LocalDate;
+import java.io.File;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.Serializable;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.InputMismatchException;
 import java.util.Optional;
 import java.util.Scanner;
 
+
 public class Sistema {
 
-    static String path_vendas_bin = "binario/livros.bin";
-    static String path_clientes_bin = "binario/clientes.bin";
-    static String path_jogos_bin = "binario/clientes.bin";
+    static final String PATH_CLIENTES_BIN = "data_bin/clientes.bin";
+    static final String PATH_JOGOS_BIN = "data_bin/jogos.bin";
 
-    public static void salvarClientesBin(){}
-    public static void salvarVendasBin(){}
-    public static void salvarJogosBin(){}
+    private static void salvarBin(Serializable data, String path)   throws Exception{
+        File arquivo = new File(path);
+        arquivo.getParentFile().mkdirs();
+        arquivo.createNewFile();
+        ObjectOutputStream oos = new ObjectOutputStream(Files.newOutputStream(Paths.get(path)));
+        oos.writeObject(data);
+    }
 
-    public static void carregarJogosBin(){}
-    public static void carregarClienteBin(){}
-    public static void carregarVendasBin(){}
+    private static Object carregarBin(String path) throws Exception{
+        ObjectInputStream ois = new ObjectInputStream(Files.newInputStream(Paths.get(path)));
+        return ois.readObject();
+    }
 
-    public static void menu(){
-        Loja loja = new Loja();
-        ArrayList<Cliente> clientes = null;
-        ArrayList<Jogo> jogos = null;
-        ArrayList<Venda> vendas = null;
+    public static void salvarClientesBin(ArrayList<Cliente>  clientes) throws Exception{
+        salvarBin(clientes, PATH_CLIENTES_BIN);
+    }
+    public static void salvarJogosBin(ArrayList<Jogo> jogos) throws Exception{
+        salvarBin(jogos, PATH_JOGOS_BIN);
+    }
+
+
+    public static ArrayList<Jogo>  carregarJogosBin() throws Exception{
+        return (ArrayList<Jogo>) carregarBin(PATH_JOGOS_BIN);
+    }
+    public static ArrayList<Cliente> carregarClienteBin() throws Exception{
+        return (ArrayList<Cliente>) carregarBin(PATH_CLIENTES_BIN);
+    }
+
+    public static void menu(Loja loja){
         
-        try {
-            clientes = carregarClienteBin(path_clientes_bin);
-            jogos = carregarJogosBin(path_livros_bin);
-            vendas = carregarVendasBin();
-        } catch (Exception e) {
-            clientes =  carregarClientesTexto(path_clientes_txt);
-            jogos =  carregarJogosTexto(path_livros_txt);
-        }
-
-        
-        salvarClientesBin(clientes, path_clientes_bin);
-        salvarVendasBin(jogos, path_livros_bin);
-        salvarJogosBin(jogos, path_livros_bin);
-
-
         Scanner teclado = new Scanner(System.in);
         int opcao = 0;        
         do{
-            System.out.println("\n\n\nDigite a opcao desejada: ");
-            System.out.println("1 - Cadastrar novo cliente");
-            System.out.println("2 - Cadastrar novo jogo");
-            System.out.println("3 - Realizar nova venda");
-            System.out.println("4 - Jogo mais vendido");
-            System.out.println("5 - Jogo menos vendido");
-            System.out.println("6 - Valor medio compras");
-            System.out.println("7 - Valor mensal vendido");
+            System.out.println("\nDigite a opcao desejada: ");
+            System.out.println("1  - Cadastrar novo cliente");
+            System.out.println("2  - Cadastrar novo jogo");
+            System.out.println("3  - Realizar nova venda");
+            System.out.println("4  - Jogo mais vendido");
+            System.out.println("5  - Jogo menos vendido");
+            System.out.println("6  - Valor medio compras");
+            System.out.println("7  - Valor mensal vendido");
+            System.out.println("8  - Historico de venda de um cliente");
+            System.out.println("9  - Visualizar clientes cadastrados");
+            System.out.println("10 - Visualizar jogos cadastrados");
 
             System.out.println("0 - Sair");
             try{
@@ -79,12 +88,13 @@ public class Sistema {
                     try {
                         
                         Jogo novoJogo = loja.cadastrarJogo(teclado);
-                        System.out.println("\nCliente cadastrado com sucesso!\n" + novoJogo.toString() + "\n" );
-                        break;
+                        System.out.println("\nJogo cadastrado com sucesso!\n" + novoJogo.toString() + "\n" );
                     } catch (Exception e) {
                         System.out.println(e.getMessage());
+                        
                     }
-                
+
+                    break;
                 
                 case 3:
                     //  Realizar nova venda
@@ -158,14 +168,45 @@ public class Sistema {
                     }
 
                     break;
+
+                case 8:
+                    // Historico de compras de um cliente
+                    try {
+                        String historico = loja.historicoCliente(teclado);     
+                        System.out.println(historico);                                  
+                    } catch (Exception e) {
+                        System.out.println(e.getMessage());
+                    }
+
+                    break;
+                case 9:
+                    // Visualizar clientes cadastrados
+                    try {
+                        String cadastrados = loja.clientesCadastrados();     
+                        System.out.println(cadastrados);                                  
+                    } catch (Exception e) {
+                        System.out.println(e.getMessage());
+                    }
+
+                    break;
+                case 10:
+                    // Visualizar jogos cadastrados
+                    try {
+                        String cadastrados = loja.jogosCadastrados();     
+                        System.out.println(cadastrados);                                   
+                    } catch (Exception e) {
+                        System.out.println(e.getMessage());
+                    }
+
+                    break;
                         
                 default:
-                    System.out.println("Opcao invalida. Selecione um valor dentre os apresentados no menu!");
+                    System.out.println("\nOpcao invalida. Selecione um valor dentre os apresentados no menu!");
                     break;
 
                 case 0:
                     teclado.close();
-                    System.out.println("Encerrando sistema...");
+                    System.out.println("\nEncerrando sistema...");
                     break;
                 }
         }while(opcao!=0);
@@ -174,7 +215,30 @@ public class Sistema {
 
 
     public static void main(String[] args) throws Exception {
+        Loja loja;
+        ArrayList<Cliente> clientes = new ArrayList<Cliente>();
+        ArrayList<Jogo> jogos = new ArrayList<Jogo>();
+        
 
-        menu();
+        try {            
+            clientes = carregarClienteBin();
+            jogos = carregarJogosBin();
+            loja =  new Loja(clientes, jogos);
+            System.out.println("\nArquivos binarios carregados com sucesso");
+        } catch (Exception e) {
+            loja = new Loja();
+            System.out.println("\nNao foi possivel carregar arquivos binarios");
+        }
+        
+        menu(loja);
+
+        try {
+            // loja.initTest();
+            salvarClientesBin(loja.clientesList());
+            salvarJogosBin(loja.jogosList());
+        } catch (Exception e) {
+            System.out.println("Erro ao registrar os arquivos binarios!");
+            System.out.println(e.getMessage());
+        }
     }
 }

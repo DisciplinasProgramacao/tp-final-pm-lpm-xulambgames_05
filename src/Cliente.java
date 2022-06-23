@@ -1,12 +1,14 @@
+import java.io.Serializable;
 import java.util.ArrayList;
 
-public class Cliente {
+public class Cliente implements Serializable{
 
     private String codigo;
     private String nome;
     private String senha;
-    private String username;
     private String email;
+    private String username;
+
     private ArrayList<Venda> vendasList;
     private TipoCliente tipoCliente;
     
@@ -23,7 +25,15 @@ public class Cliente {
     public TipoCliente getTipoCliente() {
         return tipoCliente;
     }
-
+    public String getSenha() {
+        return senha;
+    }
+    public String getUsername() {
+        return username;
+    }
+    public String getEmail() {
+        return email;
+    }
     public String getCodigo() {
         return this.codigo;
     }
@@ -44,9 +54,9 @@ public class Cliente {
     }
 
     public String historicoCompras(){
-        String s = "-----\tHistorico de vendas do cliente: " + this.nome + "\t-----\n\n" ;
+        String s = "-----\tHistorico de vendas do cliente de codigo = "+ this.getCodigo() +"\t-----\n\n" ;
         if (this.vendasList.size() == 0) {
-            s += "Nenhuma venda foi realizada por esse cliente";
+            s += "Nenhuma venda foi realizada por esse cliente\n";
         }
 
         for (Venda v : this.vendasList) {
@@ -59,6 +69,9 @@ public class Cliente {
         return s;
     }
 
-
+    @Override
+    public String toString(){
+        return this.codigo +" - " + this.nome; 
+    }
 
 } 
