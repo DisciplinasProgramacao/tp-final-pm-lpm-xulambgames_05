@@ -233,7 +233,6 @@ public class Sistema {
         menu(loja);
 
         try {
-            // loja.initTest();
             salvarClientesBin(loja.clientesList());
             salvarJogosBin(loja.jogosList());
         } catch (Exception e) {
