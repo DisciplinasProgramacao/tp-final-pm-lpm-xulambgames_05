@@ -1,12 +1,12 @@
+import java.io.Serializable;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 
 import java.util.HashMap;
 
-public class Venda{
+public class Venda implements Serializable{
     private ArrayList<Jogo> jogosList;
-    
     private LocalDate dataVenda;
     
     
