@@ -372,7 +372,54 @@ public class Loja {
         if (!this.clientesMap.containsKey(codigo)) {
             throw new Exception("O codigo de cliente informado não está cadastrado!");
         }
-        return this.clientesMap.get(codigo).historicoCompras();
+        int opData = -1;
+        int opTipo = -1;
+        boolean filtrarData = false;
+        boolean filtrarTipo = false;
+
+        while ((opData != 0 && opData != 1) &&
+                (opTipo != 0 && opTipo != 1)) {
+            try {
+                
+           
+                System.out.println("\nDeseja filtrar pela data? (1 para sim e 0 para nao): ");
+                opData = teclado.nextInt();
+                teclado.nextLine();
+                
+                switch (opData) {
+                    case 1:
+                            filtrarData = true;
+                        break;
+                    case 0:
+                            filtrarData = false;
+                        break;
+                    
+                    default:
+                        System.out.println("\nOpcao invalida!");
+                        break;
+                }
+                System.out.println("\nDeseja filtrar pelo tipo do jogo? (1 para sim e 0 para nao): ");
+                opTipo = teclado.nextInt();
+                teclado.nextLine();
+                
+                switch (opTipo) {
+                    case 1:
+                            filtrarTipo = true;
+                        break;
+                    case 0:
+                            filtrarTipo = false;
+                        break;
+                    
+                    default:
+                        System.out.println("\nOpcao invalida!");
+                        break;
+                }
+            }catch(InputMismatchException ex){
+                teclado.nextLine();
+                System.out.println("Entrada invalida");
+            }
+        }
+        return this.clientesMap.get(codigo).historicoCompras(teclado, filtrarData, filtrarTipo);
     }
 
     public ArrayList<Cliente> clientesList(){
