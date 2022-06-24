@@ -1,4 +1,6 @@
 import java.io.Serializable;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.security.InvalidParameterException;
 
 public class Jogo implements Serializable{
@@ -13,11 +15,13 @@ public class Jogo implements Serializable{
     private void init(String codigo, String titulo, double precoBase, TipoJogo tipoJogo, double percDesconto){
         this.codigo = codigo;
         this.titulo = titulo;
-        this.precoBase = precoBase;
         this.tipoJogo = tipoJogo;
         this.percDesconto = percDesconto;
+        BigDecimal bd = BigDecimal.valueOf(precoBase);
+        bd = bd.setScale(2, RoundingMode.HALF_UP);
+        this.precoBase = bd.doubleValue();
     }
-
+    
     public Jogo(String codigo, String titulo, double precoBase, TipoJogo tipoJogo, double percDesconto){
 
         if (!(tipoJogo.isDescontoValido(percDesconto))) {
@@ -53,23 +57,24 @@ public class Jogo implements Serializable{
     public double calcularValor(){
         return this.precoBase - calcularDesconto();
     }
+
     public double calcularDesconto(){
-        return precoBase * this.percDesconto;
+        double valorDesconto = precoBase * this.percDesconto;
+        BigDecimal bd = BigDecimal.valueOf(valorDesconto);
+        bd = bd.setScale(2, RoundingMode.HALF_UP);
+        return bd.doubleValue();
     }
 
     public TipoJogo getTipoJogo() {
         return this.tipoJogo;
     }
 
-    public boolean equals(Jogo outro){
-        if (outro.getCodigo().equals(this.getCodigo())) {
-            return true;
-        }
-        return false;
-    }
-
     @Override
     public String toString(){
-        return this.codigo + " - \"" + this.titulo + "\" R$" + this.calcularValor() +" "+ this.getTipoJogo().name().toUpperCase();
+        StringBuilder s = new StringBuilder();
+        s.append(this.codigo + " - \"" + this.titulo);
+        s.append(String.format("\" R$%.2f", this.calcularValor()));
+        s.append(" "+ this.getTipoJogo().name().toUpperCase());
+        return  s.toString();
     }
 }

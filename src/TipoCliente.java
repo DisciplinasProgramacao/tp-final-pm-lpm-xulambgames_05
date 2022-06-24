@@ -1,4 +1,3 @@
-
 public enum TipoCliente {
     CADASTRADO(0.0, 0.0),
     EMPOLGADO( 10.0, 0.1),

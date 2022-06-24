@@ -1,3 +1,5 @@
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -41,7 +43,6 @@ public class Loja {
                     throw new InputMismatchException("\nEntrada invalida! Digite um valor de 1 a 12 para o mes e um valor > 0 para o ano");
                 }
             }catch(InputMismatchException ex){
-                teclado.nextLine();
                 System.out.println(ex.getMessage());
             }
         }
@@ -77,9 +78,13 @@ public class Loja {
 
         double totalArrecadado = vendas
             .stream()
-            .map(Venda::calcularValor)
+            .map(Venda::getValorPago)
             .reduce(0.0, (a, b) -> a + b);
-        return totalArrecadado / vendas.size(); 
+
+        double valorMedio = totalArrecadado / vendas.size(); 
+        BigDecimal bd = BigDecimal.valueOf(valorMedio);
+        bd = bd.setScale(2, RoundingMode.HALF_UP);
+        return bd.doubleValue();
     }
     
     public ArrayList<Jogo> jogoMaisVendido(){
@@ -153,7 +158,7 @@ public class Loja {
                 System.out.println("\nO codigo do cliente informado não está cadastrado!");
                 
             }else if(!(codCliente.equals("sair"))){
-                novaVenda = registrarVenda(this.clientesMap.get(codCliente), new Venda(jogos, LocalDate.now()));
+                novaVenda = registrarVenda(this.clientesMap.get(codCliente), new Venda(jogos, LocalDate.now(), this.clientesMap.get(codCliente)));
                 codCliente = "sair";
             }
             
@@ -162,7 +167,8 @@ public class Loja {
         return novaVenda;
     }
     
-    private Venda registrarVenda(Cliente cliente,Venda venda){    
+    private Venda registrarVenda(Cliente cliente,Venda venda){   
+        venda.verificarDescontoCliente(cliente);
         cliente.addVenda(venda);
         return venda;
     }
@@ -256,7 +262,7 @@ public class Loja {
     }
 
     public Jogo cadastrarJogo(Scanner teclado) throws Exception{
-        System.out.println("\nDigite o codigo do jogo: ");
+        System.out.println("\nDigite o codigo do jogo ( ou \"sair\" para cancelar a operacao): ");
         String codigo = teclado.nextLine();
         Jogo jogo = null;
         
@@ -312,9 +318,14 @@ public class Loja {
                 System.out.println("\nDigite a preco base do jogo: ");
                 precoBase = teclado.nextDouble();
                 teclado.nextLine();
-                System.out.println("\nDigite o percentual de desconto do jogo (entre " + tipoJogo.getDescontoMin() +" e " + tipoJogo.getDescontoMax() + "): " );
-                percDesconto = teclado.nextDouble();
-                teclado.nextLine();
+                if (tipoJogo.getDescontoMin() != tipoJogo.getDescontoMax()) {
+                    System.out.println("\nDigite o percentual de desconto do jogo (entre " + tipoJogo.getDescontoMin() +" e " + tipoJogo.getDescontoMax() + "): " );
+                    percDesconto = teclado.nextDouble();
+                    teclado.nextLine();
+                }else{
+                    percDesconto = tipoJogo.getDescontoMin();
+                }
+
                 if (!tipoJogo.isDescontoValido(percDesconto)) {
                     precoBase = null;
                     percDesconto = null;

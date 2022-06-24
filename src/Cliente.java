@@ -38,15 +38,12 @@ public class Cliente implements Serializable{
         return this.codigo;
     }
 
+    public double percDesconto(){
+        return tipoCliente.getDesconto();
+    }
+    
     public ArrayList<Venda> getVendasList(){
         return this.vendasList;
-    }
-
-    public boolean equals(Cliente outro){
-        if (this.getCodigo().equals(outro.getCodigo())){
-            return true;
-        }
-        else return false;
     }
 
     public void addVenda(Venda venda) {
@@ -71,7 +68,7 @@ public class Cliente implements Serializable{
 
     @Override
     public String toString(){
-        return this.codigo +" - " + this.nome; 
+        return this.codigo +" - " + this.nome + " - " + this.tipoCliente.name().toUpperCase(); 
     }
 
 } 
