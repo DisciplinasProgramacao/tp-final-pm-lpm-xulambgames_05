@@ -1,15 +1,20 @@
 import java.io.Serializable;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 
-import java.util.HashMap;
-
 public class Venda implements Serializable{
     private ArrayList<Jogo> jogosList;
     private LocalDate dataVenda;
-    
-    
+    private IPromocao promoAtiva = null;
+    private double valorPago;
+
+    public double getValorPago() {
+        return valorPago;
+    }
+
     public ArrayList<Jogo> getJogosList() {
         return jogosList;
     }
@@ -18,60 +23,57 @@ public class Venda implements Serializable{
         return dataVenda;
     }
 
-
     public void setDataVenda(LocalDate dataVenda) {
         this.dataVenda = dataVenda;
     }
 
-
-    public Venda(ArrayList<Jogo> jogosList, LocalDate dataVenda) {
+    public Venda(ArrayList<Jogo> jogosList, LocalDate dataVenda, Cliente clienteComprador) {
         this.jogosList = jogosList;
         this.dataVenda = dataVenda;
+        this.verificarDescontoCliente(clienteComprador);
     }
 
-
-    public double calcularValor(){
+    private double somaValorJogos(){
         double valor = 0.0;
         for (Jogo jogo : jogosList) {
             valor += jogo.calcularValor();
         }
-        valor -= (valor * calcularDesconto());
         return valor;
     }
 
+    public double calcularValor(){
+        double valor = somaValorJogos();
+        valor -= calcularDesconto();
+        return valor;
+    }
+
+    private void verificarPromocoes(){
+        if (Promocao10.isAptoDesconto(this)) {
+            this.promoAtiva = Promocao10.getInstance();
+        }
+        if (Promocao20.isAptoDesconto(this)) {
+            this.promoAtiva = Promocao20.getInstance();
+        }
+    }
 
     public double calcularDesconto() {
+        verificarPromocoes();
+        double valorDesconto = 0;
         double desconto = 0;
-        HashMap<TipoJogo,Integer> mapaJogos = new HashMap<TipoJogo, Integer>();
-
-        /*  LANCAMENTO(0),
-            PREMIUM(1),
-            REGULAR(2),
-            PROMOCAO(3); */
-
-            // Teste
-        mapaJogos.put(TipoJogo.LANCAMENTO,  (int) jogosList.stream().filter(j -> j.getTipoJogo() == TipoJogo.LANCAMENTO).count());
-        mapaJogos.put(TipoJogo.PREMIUM,     (int) jogosList.stream().filter(j -> j.getTipoJogo() == TipoJogo.PREMIUM).count());
-        mapaJogos.put(TipoJogo.REGULAR,     (int) jogosList.stream().filter(j -> j.getTipoJogo() == TipoJogo.REGULAR).count());
-        mapaJogos.put(TipoJogo.PROMOCAO,    (int) jogosList.stream().filter(j -> j.getTipoJogo() == TipoJogo.PROMOCAO).count());
-
-
-        // PROMOCOES
-        if (mapaJogos.get(TipoJogo.PREMIUM) >= 2 || mapaJogos.get(TipoJogo.REGULAR) >= 4) {
-            desconto = 0.1;
+        if (this.promoAtiva != null) {
+            desconto = this.promoAtiva.percDesconto();
         }
 
-        if (mapaJogos.get(TipoJogo.LANCAMENTO)>=2 || 
-            mapaJogos.get(TipoJogo.PREMIUM)>=3 || 
-            mapaJogos.get(TipoJogo.REGULAR)>=5 ||
-            (mapaJogos.get(TipoJogo.PREMIUM)>=2 && jogosList.size() >=3) ||
-            (mapaJogos.get(TipoJogo.REGULAR)>=3 && (mapaJogos.get((TipoJogo.LANCAMENTO)) >=1 || mapaJogos.get((TipoJogo.PREMIUM)) >=1))
-            ) {
-            desconto = 0.2;
-        }
+        valorDesconto = desconto * somaValorJogos();
+        BigDecimal bd = BigDecimal.valueOf(valorDesconto);
+        bd = bd.setScale(2, RoundingMode.HALF_UP);
 
-        
-        return desconto;
+        return valorDesconto;
+    }
+
+    public void verificarDescontoCliente(Cliente cliente){
+        valorPago = calcularValor();
+        this.valorPago -= (calcularValor() * cliente.percDesconto());
     }
 
     @Override
@@ -85,7 +87,7 @@ public class Venda implements Serializable{
         for (Jogo j : this.jogosList) {
             s+= "\t" + j.toString() + "\n";
         }
-        s = s + "\n\tvalor total: R$" + this.calcularValor();
+        s = s + String.format("\n\tvalor total: R$%.2f", this.valorPago);
         s +="\n}";
         return s;
     }
